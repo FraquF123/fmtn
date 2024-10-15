@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация и Игра</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+        }
+        .registration-container, .game-container, .leaderboard-container {
+            text-align: center;
+        }
+        #registerButton, #tapButton, #showLeaderboard {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #61dafb;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #registerButton:hover, #tapButton:hover, #showLeaderboard:hover {
+            background-color: #21a1f1;
+        }
+        .hidden {
+            display: none;
+        }
+        .leaderboard-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <h1>Регистрация</h1>
+        <input type="text" id="username" placeholder="Введите ваше имя">
+        <button id="registerButton">Зарегистрироваться</button>
+    </div>
+
+    <div class="game-container hidden">
+        <h1 id="welcomeMessage"></h1>
+        <div id="score">0</div>
+        <button id="tapButton">Tap me!</button>
+        <button id="showLeaderboard">Показать таблицу лидеров</button>
+    </div>
+
+    <div class="leaderboard-container hidden">
+        <h1>Таблица лидеров</h1>
+        <div id="leaderboard"></div>
+        <button onclick="goBackToGame()">Вернуться к игре</button>
+    </div>
+
+    <script>
+        let score = 0;
+        const users = {}; // Хранение данных пользователей и их очков
+        const scoreDisplay = document.getElementById('score');
+        const tapButton = document.getElementById('tapButton');
+        const registerButton = document.getElementById('registerButton');
+        const usernameInput = document.getElementById('username');
+        const registrationContainer = document.querySelector('.registration-container');
+        const gameContainer = document.querySelector('.game-container');
+        const leaderboardContainer = document.querySelector('.leaderboard-container');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const showLeaderboardButton = document.getElementById('showLeaderboard');
+        const leaderboardDisplay = document.getElementById('leaderboard');
+
+        registerButton.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            if (username) {
+                registrationContainer.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
+                welcomeMessage.textContent = `Добро пожаловать, ${username}! Начнем игру.`;
+                if (!users[username]) {
+                    users[username] = { score: 0 };
+                }
+                score = 0;
+            } else {
+                alert('Пожалуйста, введите ваше имя');
+            }
+        });
+
+        tapButton.addEventListener('click', () => {
+            score++;
+            scoreDisplay.textContent = score;
+        });
+
+        showLeaderboardButton.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            if (users[username]) {
+                users[username].score = Math.max(users[username].score, score); // Обновляем рекорд игрока
+            }
+            displayLeaderboard();
+        });
+
+        function displayLeaderboard() {
+            gameContainer.classList.add('hidden');
+            leaderboardContainer.classList.remove('hidden');
+            const sortedUsers = Object.entries(users).sort((a, b) => b[1].score - a[1].score);
+            leaderboardDisplay.innerHTML = sortedUsers.map(([user, data], index) => `<div>${index + 1}. ${user}: ${data.score} очков</div>`).join('');
+        }
+
+        function goBackToGame() {
+            leaderboardContainer.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
